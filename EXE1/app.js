@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require("mongoose");
+require('dotenv').config({ path: 'ENV_FILENAME' });
 const Company_Router = require('./routes/Company');
 const Employee_Router = require('./routes/Employee');
 
@@ -16,12 +17,7 @@ mongoose.connect(
         useUnifiedTopology: true
     }
 );
-mongoose.connect(
-    'mongodb://localhost:27017/Employee_hw17', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }
-);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

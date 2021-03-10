@@ -40,11 +40,11 @@ Company_router.put('/addCompany', (req, res) => {
 // !-----------------------------------------------------------------------------------------READ COMPANY
 
 Company_router.get('/allCompany', (req, res) => {
-    console.log("get is ok");
+
     Company.find({}, (err, Company_All) => {
         if (err) return res.status(500).send("Something went wrong in get all uCompany! \n" + err);
-        console.log(Company_All)
-        res.json(Company_All)
+
+        res.render('')
     })
 })
 
@@ -94,7 +94,7 @@ Company_router.delete("/deleteCompany/:id", (req, res) => {
 });
 // !----------------------------------------------------------------------------------------------FINDS EMPLOYEE OF COMPANY
 Company_router.get("/findCompany/:id", (req, res) => {
-        Employee.find({ Employee_Company: req.params.id }, (err, employee) => {
+        Employee.find({ Employee_Company: req.params.id }, { "Company_Manager": 0 }, (err, employee) => {
             if (err) return res.status(500).send("Something went wrong in delete Company! \n" + err);
             if (!employee) return res.status(404).send("Company not found")
             return res.json(employee)
@@ -104,11 +104,38 @@ Company_router.get("/findCompany/:id", (req, res) => {
 Company_router.get("/DateRecordCompany/:id", (req, res) => {
     let Now_Date = new Date().getFullYear() - req.params.id;
     console.log(Now_Date);
-    Company.find({ "Company_Date_Record": { $gt: `${Now_Date}` } }, (err, company) => {
+    Company.find({ "Company_Date_Record": { $gt: `${Now_Date}` } }, { "Company_Manager": 0 }, (err, company) => {
         if (err) return res.status(500).send("Something went wrong in delete Company! \n" + err);
         if (!company) return res.status(404).send("CompNY not found")
         res.json(company)
     })
 
 })
+Company_router.get("/AllCompanyManager", (req, res) => {
+    Employee.find({}, (err, company) => {
+        if (err) return res.status(500).send("Something went wrong in get all uEmployee! \n" + err);
+        Company.find({}).populate('Company_Manager').exec((err, employee) => {
+            if (err) return res.status(500).send("Something went wrong in get all uEmployee! \n" + err);
+            res.json(employee)
+        })
+
+
+    })
+})
+Company_router.post('/changeCity', (req, res) => {
+
+    Company.updateMany({ "__v": 0 },
+        req.body, {
+            Company_City: req.body.Company_City,
+            Company_State: req.body.Company_State,
+        }, (err, company_changed) => {
+            if (err) return res.status(500).json({
+                msg: "Server Error :)",
+                err: err.msg
+            });
+            res.json(company_changed);
+        })
+
+
+});
 module.exports = Company_router;

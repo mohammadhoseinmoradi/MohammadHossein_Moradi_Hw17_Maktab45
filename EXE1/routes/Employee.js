@@ -30,16 +30,15 @@ Employee_router.put('/addEmployee', (req, res) => {
                 Employee_Birthday: req.body.Employee_Birthday,
                 Employee_Company: req.body.Employee_Company
             })
-            console.log(1111111111111111);
-            NEW_RELATION = new Relation({
-                Employee: NEW_Employee._id,
-                company: req.body.Employee_Company
+            Company.findOneAndUpdate({
+                _id: req.body.Employee_Company
+            }, { $set: { Company_Manager: NEW_Employee._id } }, (err, employee_Update) => {
+                if (err) return res.status(500).json({
+                    msg: "Server Error :)",
+                    err: err.msg
+                });
+
             })
-            console.log(22222222222);
-            NEW_RELATION.save((err, relations) => {
-                if (err) return res.status(500).send("Something went wrong in add Employee \n!" + err);
-            })
-            console.log(NEW_Employee)
             NEW_Employee.save((err, Employee_Data) => {
                 if (err) return res.status(500).send("Something went wrong in add Employee \n!" + err);
                 return res.json({
@@ -63,24 +62,87 @@ Employee_router.get('/allEmployee', (req, res) => {
 })
 
 // !--------------------------------------------------------------------------------------------------UPDATE EMPLOYEE
-Employee_router.post("/updateEmployee/:Employee_id", (req, res) => {
-    Employee.findOneAndUpdate({
-        _id: req.params.id
-    }, req.body, {
-        Employee_First_Name: req.body.Employee_First_Name,
-        Employee_Last_Name: req.body.Employee_Last_Name,
-        Employee_National_Number: req.body.Employee_National_Number,
-        Employee_Gender: req.body.Employee_Gender,
-        Employee_Manager: req.body.Employee_Manager,
-        Employee_Birthday: req.body.Employee_Number,
-        Employee_Company: req.body.Employee_Company
-    }, (err, employee_Update) => {
+Employee_router.post("/updateEmployee/:id", (req, res) => {
+    console.log(req.params.id);
+
+    let Now_Manger = req.body.Employee_Manager
+    Employee.find({ _id: req.params.id }, (err, employee) => {
         if (err) return res.status(500).json({
             msg: "Server Error :)",
             err: err.msg
         });
-        res.json(employee_Update);
+        Employee_update = employee;
+        if (Now_Manger == employee[0].Employee_Manager) {
+            Employee.findOneAndUpdate({
+                _id: req.params.id
+            }, req.body, {
+                Employee_First_Name: req.body.Employee_First_Name,
+                Employee_Last_Name: req.body.Employee_Last_Name,
+                Employee_National_Number: req.body.Employee_National_Number,
+                Employee_Gender: req.body.Employee_Gender,
+                Employee_Manager: req.body.Employee_Manager,
+                Employee_Birthday: req.body.Employee_Number,
+                Employee_Company: req.body.Employee_Company
+            }, (err, employee_Update) => {
+                if (err) return res.status(500).json({
+                    msg: "Server Error :)",
+                    err: err.msg
+                });
+                res.json(employee_Update);
+            })
+        } else if (NEW_Employee == true) {
+            Employee.find({ "Employee_Company": employee[0].Employee_Company }, (err, employee) => {
+                if (err) return res.status(500).json({
+                    msg: "Server Error :)",
+                    err: err.msg
+                });
+                Employee.updateMany({ "Employee_Company": req.body.Employee_Company }, { $set: { "Employee_Manager": false } }, (err, employee) => {
+                    if (err) return res.status(500).json({
+                        msg: "Server Error :)",
+                        err: err.msg
+                    });
+                    Employee.findOneAndUpdate({
+                        _id: req.params.id
+                    }, req.body, {
+                        Employee_First_Name: req.body.Employee_First_Name,
+                        Employee_Last_Name: req.body.Employee_Last_Name,
+                        Employee_National_Number: req.body.Employee_National_Number,
+                        Employee_Gender: req.body.Employee_Gender,
+                        Employee_Manager: req.body.Employee_Manager,
+                        Employee_Birthday: req.body.Employee_Number,
+                        Employee_Company: req.body.Employee_Company
+                    }, (err, employee_Update) => {
+                        if (err) return res.status(500).json({
+                            msg: "Server Error :)",
+                            err: err.msg
+                        });
+                        res.json(employee_Update);
+                    })
+                })
+            })
+        } else {
+            Employee.findOneAndUpdate({
+                _id: req.params.id
+            }, req.body, {
+                Employee_First_Name: req.body.Employee_First_Name,
+                Employee_Last_Name: req.body.Employee_Last_Name,
+                Employee_National_Number: req.body.Employee_National_Number,
+                Employee_Gender: req.body.Employee_Gender,
+                Employee_Manager: req.body.Employee_Manager,
+                Employee_Birthday: req.body.Employee_Number,
+                Employee_Company: req.body.Employee_Company
+            }, (err, employee_Update) => {
+                if (err) return res.status(500).json({
+                    msg: "Server Error :)",
+                    err: err.msg
+                });
+                res.json(employee_Update);
+            })
+        }
+
     })
+
+
 
 
 
@@ -125,6 +187,15 @@ Employee_router.get('/FindAge', (req, res) => {
     })
     // !---------------------------------------------------------------------------------------------------------------FIND ALL MANGER
 Employee_router.get("/AllManger", (req, res) => {
+    Company.find({}, (err, company) => {
+        if (err) return res.status(500).send("Something went wrong in get all uEmployee! \n" + err);
+        Employee.find({ Employee_Manager: true }, { __v: 0 }).populate('Employee_Company', { Company_Name: 1 }).exec((err, employee) => {
+            if (err) return res.status(500).send("Something went wrong in get all uEmployee! \n" + err);
+            res.json(employee)
+        })
+
+
+    })
 
 })
 module.exports = Employee_router;

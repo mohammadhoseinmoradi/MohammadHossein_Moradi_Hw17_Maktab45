@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Employee = require("./Employee")
 const Schema = mongoose.Schema;
 
 const CompanySchema = new Schema({
@@ -33,8 +34,13 @@ const CompanySchema = new Schema({
         type: String,
         default: "09000000000",
         length: 11
-    }
+    },
+    Company_Manager: {
+        type: Schema.Types.ObjectId,
+        ref: "Employee",
+        default: "6048e336aaaed43380648592"
 
+    }
 
 });
 
