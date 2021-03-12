@@ -8,6 +8,7 @@ require('dotenv').config({ path: 'ENV_FILENAME' });
 const Company_Router = require('./routes/Company');
 const Employee_Router = require('./routes/Employee');
 
+
 const app = express();
 
 
@@ -20,16 +21,23 @@ mongoose.connect(
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.get('/public/javascripts/Company.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/javascripts/Company.js'));
+})
 
+// app.use('/', (req, res) => {
+//     res.render('Company')
+// })
 app.use('/Company', Company_Router);
 app.use('/Employee', Employee_Router);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

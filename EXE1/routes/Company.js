@@ -2,8 +2,15 @@ const express = require('express');
 const Company_router = express.Router()
 const Company = require('../models/Company')
 const Employee = require('../models/Employee')
+const url = require('url')
+
+Company_router.get('/CompanyPage', (req, res) => {
+
+        res.render('Company')
+
+    })
     // !---------------------------------------------------------------------------------------CREATE Company
-Company_router.put('/addCompany', (req, res) => {
+Company_router.post('/addCompany', (req, res) => {
     console.log(req.body.Company_Name)
 
     Company.find({ "Company_Name": req.body.Company_Name }, (err, company_exited) => {
@@ -41,15 +48,22 @@ Company_router.put('/addCompany', (req, res) => {
 
 Company_router.get('/allCompany', (req, res) => {
 
+    console.log(req.params);
     Company.find({}, (err, Company_All) => {
         if (err) return res.status(500).send("Something went wrong in get all uCompany! \n" + err);
 
-        res.render('')
+        res.json(Company_All)
     })
 })
+Company_router.get('/CompanyInfo/:id', (req, res) => {
+        Company.find({ _id: req.params.id }, (err, Company_All) => {
+            if (err) return res.status(500).send("Something went wrong in get all uCompany! \n" + err);
 
-// !--------------------------------------------------------------------------------------------UPDATE ONE COMPANY
-Company_router.post("/updateCompany/:Company_id", (req, res) => {
+            res.json(Company_All)
+        })
+    })
+    // !--------------------------------------------------------------------------------------------UPDATE ONE COMPANY
+Company_router.put("/updateCompany/:id", (req, res) => {
 
     Company.findOneAndUpdate({
         _id: req.params.id
@@ -138,4 +152,16 @@ Company_router.post('/changeCity', (req, res) => {
 
 
 });
+Company_router.get('/search/:id', (req, res) => {
+    let Date_arr = req.params.id.split("--")
+    console.log(Date_arr);
+    Company.find({ $and: [{ Company_Date_Record: { $gt: Date_arr[0] } }, { Company_Date_Record: { $lt: Date_arr[1] } }] }, (err, company) => {
+        if (err) return res.status(500).json({
+            msg: "Server Error :)",
+            err: err.msg
+        });
+        res.json(company);
+    })
+})
+
 module.exports = Company_router;

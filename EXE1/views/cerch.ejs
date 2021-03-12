@@ -24,9 +24,11 @@
         <div class="row pt-5">
             <div class="col-lg-8 mx-auto">
                 <h1 class="display-4">Company</h1>
-                <div id="datePikerInfo">
-
-                </div>
+                <label for="Date_Start"> DATE START:</label>
+                <input type="date" name="Date_Start" id="Date_Start">
+                <label for="End_Start"> DATE END:</label>
+                <input type="date" name="End_Start" id="End_Start">
+                <button onclick="btn_search()">Search</button>
             </div>
         </div>
     </div>
@@ -51,9 +53,36 @@
                                         <th id="Number" scope="col"> Employee's</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-
-                                </tbody>
+                                <% for(let i = 0; i <Company_All.length; i++) { %>
+                                    <tbody>
+                                        <tr onclick="Select_Row(`<%= Company_All[i]._id %>`)" id="<%= Company_All[i]._id %>">
+                                            <td>
+                                                <%= i %>
+                                            </td>
+                                            <td>
+                                                <%= Company_All[i].Company_Name %>
+                                            </td>
+                                            <td>
+                                                <%= Company_All[i].Company_Number_Record %>
+                                            </td>
+                                            <td>
+                                                <%= Company_All[i].Company_City %>
+                                            </td>
+                                            <td>
+                                                <%= Company_All[i].Company_State %>
+                                            </td>
+                                            <td>
+                                                <%= Company_All[i].Company_Date_Record %>
+                                            </td>
+                                            <td>
+                                                <%= Company_All[i].Company_Number %>
+                                            </td>
+                                            <td>
+                                                <button style="background-color:rgb(207, 172, 74);border:3px solid black;border-radius:5px;"><a style="text-decoration: none;color:black" href="/Employee/EmployeeCompany/<%= Company_All[i]._id %>"> Employee's</a></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <% } %>
                             </table>
                         </div>
                         <!-- todo ---------------------------------- Modal -------------------------------------- -->
